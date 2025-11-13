@@ -1,0 +1,30 @@
+[
+  {
+    "file": "app.py",
+    "suggestion": "repo_clone\\BackEnd\\app.py:1:0: E0401: Unable to import 'flask' (import-error)"
+  },
+  {
+    "file": "app.py",
+    "suggestion": "repo_clone\\BackEnd\\app.py:6:0: E0401: Unable to import 'flask_cors' (import-error)"
+  },
+  {
+    "file": "extract_text.py",
+    "suggestion": "repo_clone\\BackEnd\\utils\\extract_text.py:1:0: E0401: Unable to import 'pdfplumber' (import-error)"
+  },
+  {
+    "file": "extract_text.py",
+    "suggestion": "repo_clone\\BackEnd\\utils\\extract_text.py:2:0: E0401: Unable to import 'docx' (import-error)"
+  },
+  {
+    "file": "llama_prompt.py",
+    "suggestion": "repo_clone\\BackEnd\\utils\\llama_prompt.py:1:0: E0401: Unable to import 'ollama' (import-error)"
+  },
+  {
+    "file": "llama_prompt.py",
+    "suggestion": "repo_clone\\BackEnd\\utils\\llama_prompt.py:2:0: E0401: Unable to import 'transformers' (import-error)"
+  },
+  {
+    "file": "llama_prompt.py",
+    "suggestion": "repo_clone\\BackEnd\\utils\\llama_prompt.py:3:0: E0401: Unable to import 'torch' (import-error)"
+  }
+]
