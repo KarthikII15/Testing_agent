@@ -1,0 +1,278 @@
+
+## 📘 Kandidex – User Manual
+
+---
+
+### 1. 📌 Introduction
+
+**Kandidex** is an AI-powered tool for evaluating job candidates. It leverages **LLMs (like LLaMA 3)** locally via **Ollama**, making it cost-efficient and private.
+
+The user uploads two files:
+
+* An **interview transcript** (conversation with the candidate)
+* A **problem-solving test** (answers or coding test)
+
+The application:
+
+* Extracts content from the files
+* Uses a prompt to evaluate and score the candidate
+* Outputs structured feedback and recommendations
+
+ ⚠️ Caution: The AI-generated evaluation is intended to assist decision-making but should not be treated as the final hiring verdict. Human review is essential before taking any action.
+
+---
+
+### 2. 🗂️ Project Structure
+
+```plaintext
+Kandidex-master/
+├── BackEnd/
+│   ├── app.py                  # Main Flask app with evaluation logic
+│   ├── uploads/                # Temporary upload storage
+│   ├── requirements.txt        # Python dependencies
+│   └── utils/
+│       ├── extract_text.py     # File parsing logic (.txt, .pdf, .docx)
+│       └── llama_prompt.py     # Prompt construction + Ollama API logic
+├── FrontEnd/                   # React-based frontend UI
+│   ├── public/
+│   └── src/
+│       └── components/         # Likely contains form and result views
+├── README                      # Setup instructions
+```
+
+---
+
+### 3. 🧰 System Requirements
+
+#### 📦 Backend (Python):
+
+* Python 3.8+
+* Flask
+* Flask-CORS
+* `python-docx`, `PyPDF2` (for text extraction)
+
+#### 🌐 Frontend:
+
+* Node.js (v16+)
+* NPM
+
+#### 🧠 Model:
+
+* Ollama installed
+* LLaMA 3 8B model (`llama3:8b`) pulled locally
+
+---
+
+### 4. 🏗️ Setup Instructions
+
+#### 🔧 Backend Setup:
+
+1. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Install Ollama: [https://ollama.com](https://ollama.com)
+3. Pull the model:
+
+   ```bash
+   ollama pull llama3:8b
+   ```
+4. Run the backend:
+
+   ```bash
+   cd BackEnd
+   python app.py
+   ```
+
+#### 💻 Frontend Setup:
+
+1. Install dependencies:
+
+   ```bash
+   cd FrontEnd
+   npm install
+   ```
+2. Start the development server:
+
+   ```bash
+   npm start
+   ```
+
+   The UI runs on `http://localhost:3000`
+
+---
+
+### 5. 📤 Upload and Evaluation Flow
+
+**UI Fields**:
+
+* Upload Interview Transcript (`transcript`)
+* Upload Test Document (`test`)
+* Job Role (optional): e.g. "Data Scientist"
+* Skills to Rate (optional): Comma-separated string
+
+**Default Skills if Left Blank**:
+
+* Communication Skills
+* Technical Knowledge
+* Problem Solving
+
+**On Submit**:
+
+* The frontend sends a `POST` request to `/upload` (Flask API)
+* Files are stored in `BackEnd/uploads/`
+* `extract_text_from_file` parses files (.txt, .pdf, .docx)
+* `generate_evaluation` sends formatted text to LLaMA via Ollama
+* Response is returned with ratings, summary, and recommendation
+
+---
+
+### 6. ⚙️ API Reference
+
+#### 📍 Endpoint: `/upload`
+
+* **Method**: POST
+* **Consumes**: `multipart/form-data`
+* **Fields**:
+
+  * `transcript`: File (required)
+  * `test`: File (required)
+  * `job_role`: string (optional)
+  * `skills_to_rate`: string (optional)
+
+**Sample Response**:
+
+```json
+{
+  "summary": "The candidate showed moderate skill in technical concepts...",
+  "ratings": {
+    "Communication Skills": 3,
+    "Technical Knowledge": 4,
+    "Problem Solving": 2
+  },
+  "recommendation": "Not recommended for hire"
+}
+```
+### 7. Output Evaluation Guide 
+This section helps interpret the generated evaluation output. Kandidex uses a structured prompt to elicit specific feedback from the LLaMA 3 model, formatted as:
+
+✅ Candidate Name
+
+📝 Evaluation Summary
+
+⭐ Skill Ratings
+
+✅ Recommendation
+
+📧 Email Draft for HR
+
+### 7.1 🧠 Evaluation Summary
+This section captures the narrative understanding of the candidate’s strengths and weaknesses derived from the transcript and test answers.
+
+Interpreting It:
+
+Look for:
+
+Technical insights mentioned
+
+Soft skill behavior (e.g., clarity, adaptability)
+
+Mention of specific project experiences or responses
+
+Helps gauge depth vs breadth of understanding
+
+Usually begins with:
+
+“The candidate demonstrated a strong understanding of …”
+
+### 7.2 ⭐ Skill Ratings
+This is a quantified view of performance across specified (or default) skill areas. Output looks like:
+
+Skill Ratings:
+Communication Skills: 4/5
+Technical Knowledge: 3/5
+Problem Solving: 5/5
+Teamwork: 2/5
+⭐ Rating Scale:
+Rating	Meaning
+5/5	Exceptional — industry expert level
+4/5	Strong — well above average
+3/5	Average — meets expectations
+2/5	Below average — needs improvement
+1/5	Poor — lacks fundamental ability
+N/A	Skill not clearly addressed in content
+
+💡 Tip: Skills marked low (1 or 2) in core job areas should be red flags.
+
+### 7.3 ✅ Recommendation
+This is the final suggestion by the AI model, derived from the full prompt context.
+
+It will be one of the following (or similar):
+
+Hire — Candidate is suitable for the role
+
+Consider with Caution — Mixed performance, may depend on team or training
+
+Do Not Hire — Major skill or behavioral gaps detected
+
+### "⚠ Even if a transcript includes “Hire” — manually confirm it aligns with company hiring standards."
+---
+
+### 8. 📑 Supported File Types
+
+* `.txt` → Plain text
+* `.pdf` → Parsed with PyPDF2
+* `.docx` → Parsed with python-docx
+
+Files are saved temporarily in `BackEnd/uploads/` and removed manually or via custom script if needed.
+
+---
+
+### 9. 🔄 LLaMA Prompt Logic (Under the Hood)
+
+Prompt is dynamically generated based on:
+
+* Extracted transcript
+* Test content
+* Job role and selected skills
+
+LLM output is then parsed into:
+
+* Summary
+* Score per skill (1 to 5)
+* Final hiring recommendation
+
+Prompt example is found in:
+
+```python
+utils/llama_prompt.py
+```
+
+---
+
+### 10. ❗ Error Handling
+
+| Situation           | Behavior                               |
+| ------------------- | -------------------------------------- |
+| Missing files       | Returns 400: `Both files are required` |
+| Invalid file format | Returns 500 or parsing fails silently  |
+| Ollama not running  | Timeout or empty response from LLM     |
+| No skills provided  | Uses default 3 skills                  |
+
+Console logs include:
+
+* Upload status
+* File parsing status
+* First 100 characters of parsed transcript for debug
+
+⚠️ “AI results may vary based on transcript/test quality — manual validation is recommended.”
+---
+
+### 11. 🛠️ Maintenance Tips
+
+* Clean `uploads/` regularly to avoid disk clutter.
+* Restart Flask or Ollama server if performance lags.
+* Tune `generate_evaluation()` to improve output structure.
+
+---
